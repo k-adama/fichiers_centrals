@@ -1,72 +1,29 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-// import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class Login extends StatefulWidget {
-  Login({Key key, this.title}) : super(key: key);
-
-  final String title;
-
+class Test extends StatefulWidget {
   @override
-  _LoginState createState() => _LoginState();
+  _TestState createState() => _TestState();
 }
 
-class _LoginState extends State<Login> {
-  TextEditingController identifiant = new TextEditingController();
-  TextEditingController password = new TextEditingController();
-  bool invalidUser = false;
-  Future<List> sendata() async {
-    final response = await http
-        .post("https://groupetasnim.com/ts_requetes/verif.php", body: {
-      "login": "true",
-      "identifiant": identifiant.text,
-      "password": password.text,
-    });
-    if (response.statusCode == 200) {
-      var datauser = json.decode(response.body);
-      var userType = datauser[2];
-      var nomUser = datauser[3];
-      var prenomUser = datauser[4];
-
-      SharedPreferences localStorage = await SharedPreferences.getInstance();
-      localStorage.setString('userType', "$userType");
-
-      SharedPreferences localStorage1 = await SharedPreferences.getInstance();
-      localStorage1.setString('nomUser', "$nomUser");
-
-      SharedPreferences localStorage2 = await SharedPreferences.getInstance();
-      localStorage2.setString('prenomUser', "$prenomUser");
-
-      log('User type : $userType');
-      log('User last name : $nomUser');
-      log('User first name : $prenomUser');
-
-      Navigator.pushNamed(context, '/check_user_type');
-    } else {
-      log("Empty data user");
-      setState(() {
-        invalidUser = true;
-      });
-    }
-  }
-
+class _TestState extends State<Test> {
   @override
   Widget build(BuildContext context) {
+    // Build a Form widget using the _formKey created above.
     return Scaffold(
       body: Center(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: ListView(
+            // mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image(image: AssetImage('images/logoGroupeTasnim.png')),
+              const SizedBox(height: 60),
+              // Image(
+              //   image: AssetImage('images/logo.jpeg'),
+              //   width: 100,
+              // ),
               const SizedBox(height: 60),
               TextField(
-                controller: identifiant,
+                //controller: identifiant,
                 decoration: new InputDecoration(
                     // icon: FaIcon(FontAwesomeIcons.user),
                     // prefixIcon: FaIcon(FontAwesomeIcons.user),
@@ -82,7 +39,7 @@ class _LoginState extends State<Login> {
               ),
               const SizedBox(height: 30),
               TextField(
-                controller: password,
+                //controller: password,
                 decoration: new InputDecoration(
                     // icon: FaIcon(FontAwesomeIcons.lock),
                     // prefixIcon: FaIcon(FontAwesomeIcons.lock),
@@ -98,9 +55,8 @@ class _LoginState extends State<Login> {
                 obscureText: true,
               ),
               const SizedBox(height: 30),
-
               FlatButton(
-                onPressed: sendata,
+                onPressed: (){},
                 color: Colors.green,
                 child: Text("Connexion",
                     style: TextStyle(fontSize: 20, color: Colors.white)),
@@ -108,15 +64,6 @@ class _LoginState extends State<Login> {
                     borderRadius: BorderRadius.circular(10.0),
                     side: BorderSide(color: Colors.green)),
               ),
-              invalidUser
-                  ? Text(
-                      "Aucun compte trouvé",
-                      style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20),
-                    )
-                  : SizedBox(height: 5),
               // RaisedButton(
               //   color: Colors.white,
               //   textColor: Colors.green,
@@ -130,7 +77,6 @@ class _LoginState extends State<Login> {
           ),
         ),
       ),
-      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

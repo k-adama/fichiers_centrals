@@ -1,53 +1,58 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ts_requetes/admin/home_page_admin.dart';
+import 'package:ts_requetes/agent_recouvreur/home_page_agent_recouvreur.dart';
+import 'package:ts_requetes/check_user_type.dart';
+import 'package:ts_requetes/login.dart';
 
 void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class MyApp extends StatefulWidget {
+  MyApp({Key key}) : super(key: key);
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // bool _active = false;
+  bool isAuth = false;
+
+  void initState() {
+    _checkIfLoggedIn();
+    super.initState();
+    // _scrollViewController = new ScrollController();
+  }
+
+  void _checkIfLoggedIn() async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    var token = localStorage.getString('userType');
+    if (token != null) {
+      setState(() {
+        isAuth = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-       debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false,
       initialRoute: '/',
-      
-      title: 'Fichier central',
+      routes: {
+        '/main': (context) => MyApp(),
+        '/login': (context) => Login(),
+        '/check_user_type': (context) => CheckUserType(),
+        '/admin': (context) => HomePageAdmin(),
+        '/home_page_agent_recouvreur': (context) => HomePageAgentRecouvreur(),
+      },
+      title: 'TS REQUÊTES',
       theme: ThemeData(
-        
         primarySwatch: Colors.blue,
       ),
-      home: Test(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  
-  @override
-  Widget build(BuildContext context) {
-    
-    return Scaffold(
-      appBar: AppBar(
-        
-        title: Text(widget.title),
-      ), 
-      body: Center(
-        
-        
-      ),
-     
+      home: isAuth ? CheckUserType() : Login(),
     );
   }
 }
