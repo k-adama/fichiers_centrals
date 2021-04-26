@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ts_requetes/agent_recouvreur/detais_locataire.dart';
+import 'package:ts_requetes/agent_recouvreur/requetes.dart';
 
 class HomePageAgentRecouvreur extends StatefulWidget {
   HomePageAgentRecouvreur({Key key, this.title}) : super(key: key);
@@ -63,6 +67,12 @@ class _HomePageAgentRecouvreurState extends State<HomePageAgentRecouvreur> {
     );
   }
 
+  Future listeLocataires() async {
+    var url = "https://groupetasnim.com/ts_requetes/liste_locataires.php";
+    var reponse = await http.get(url);
+    return json.decode(reponse.body);
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -71,79 +81,102 @@ class _HomePageAgentRecouvreurState extends State<HomePageAgentRecouvreur> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Scaffold(
-      drawer: Drawer(
-        // Add a ListView to the drawer. This ensures the user can scroll
-        // through the options in the drawer if there isn't enough vertical
-        // space to fit everything.
-        child: ListView(
-          // Important: Remove any padding from the ListView.
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: Text('AgentRecouvreur'),
-              decoration: BoxDecoration(
-                color: Colors.green,
+    return WillPopScope(
+      child: Scaffold(
+        drawer: Drawer(
+          // Add a ListView to the drawer. This ensures the user can scroll
+          // through the options in the drawer if there isn't enough vertical
+          // space to fit everything.
+          child: ListView(
+            // Important: Remove any padding from the ListView.
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                child: Text('Encadreur réligieux'),
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                ),
               ),
-            ),
-            // ListTile(
-            //   leading: FaIcon(FontAwesomeIcons.userPlus),
-            //   title: Text('Nouveau pèlerin'),
-            //   onTap: () {
-            //     // Update the state of the app.
-            //     // ...
-            //   },
-            // ),
-            // ListTile(
-            //   leading: FaIcon(FontAwesomeIcons.users),
-            //   title: Text('Liste des pèlerins'),
-            //   onTap: () {
-            //     // Update the state of the app.
-            //     // ...
-            //   },
-            // ),
-            ListTile(
-              leading: FaIcon(FontAwesomeIcons.signOutAlt),
-              title: Text('Déconnexion'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-                _showMyDialog();
-              },
-            ),
+              ListTile(
+                leading: FaIcon(FontAwesomeIcons.userPlus),
+                title: Text('Liste des locataires'),
+                onTap: () {
+                  // Update the state of the app.
+                  // ...
+                },
+              ),
+              ListTile(
+                leading: FaIcon(FontAwesomeIcons.users),
+                title: Text('Requêtes'),
+                onTap: () {
+                  Navigator.of(context).push(new MaterialPageRoute(
+                      builder: (builderContext) => new Requetes()));
+                },
+              ),
+              ListTile(
+                leading: FaIcon(FontAwesomeIcons.signOutAlt),
+                title: Text('Déconnexion'),
+                onTap: () {
+                  // Update the state of the app.
+                  // ...
+                  _showMyDialog();
+                },
+              ),
+            ],
+          ),
+        ),
+        appBar: AppBar(
+          brightness: Brightness.dark,
+          title: Text("Liste des locataires"),
+        ),
+        body: Column(
+          children: [
+            Container(
+              height: 600,
+              child: FutureBuilder(
+                future: listeLocataires(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) print(snapshot.error);
+                  return snapshot.hasData
+                      ? ListView.builder(
+                          itemCount: snapshot.data.length,
+                          itemBuilder: (context, index) {
+                            List list = snapshot.data;
+                            return Card(
+                              child: Container(
+                                child: ListTile(
+                                  title: Text(
+                                    list[index]['Prenoms'] +
+                                        " " +
+                                        list[index]['Nom'],
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        // fontWeight: FontWeight.bold,
+                                        fontSize: 25),
+                                  ),
+                                  trailing: Icon(Icons.arrow_right),
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              DetailsLocataire(
+                                                  id: list[index]
+                                                      ['CodeParticulier'])),
+                                    );
+                                  },
+                                ),
+                              ),
+                            );
+                          })
+                      : Center();
+                },
+              ),
+            )
           ],
         ),
       ),
-      appBar: AppBar(
-        title: Text("AgentRecouvreuristrateur"),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Page d\'accueil AgentRecouvreur',
-            ),
-          ],
-        ),
-      ),
-      // This trailing comma makes auto-formatting nicer for build methods.
+      onWillPop: () async => false,
     );
   }
 }

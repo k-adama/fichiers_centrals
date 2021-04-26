@@ -3,16 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePageAdmin extends StatefulWidget {
-  HomePageAdmin({Key key, this.title}) : super(key: key);
+class HomePageLocataire extends StatefulWidget {
+  HomePageLocataire({Key key, this.title}) : super(key: key);
+
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
 
   final String title;
 
   @override
-  _HomePageAdminState createState() => _HomePageAdminState();
+  _HomePageLocataireState createState() => _HomePageLocataireState();
 }
 
-class _HomePageAdminState extends State<HomePageAdmin> {
+class _HomePageLocataireState extends State<HomePageLocataire> {
   void logout() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.clear();
@@ -54,13 +63,28 @@ class _HomePageAdminState extends State<HomePageAdmin> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  var nomUser;
+  var prenomUser;
+
+  getSharedPreferences() async {
+    SharedPreferences localStorage1 = await SharedPreferences.getInstance();
+    var nomUser = localStorage1.getString('nomUser');
+
+    SharedPreferences localStorage2 = await SharedPreferences.getInstance();
+    var prenomUser = localStorage2.getString('prenomUser');
+
+    setState(() {
+      prenomUser = prenomUser;
+      nomUser = nomUser;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       drawer: Drawer(
         // Add a ListView to the drawer. This ensures the user can scroll
@@ -71,19 +95,19 @@ class _HomePageAdminState extends State<HomePageAdmin> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              child: Text('Administrateur'),
+              child: Text('$nomUser $prenomUser'),
               decoration: BoxDecoration(
                 color: Colors.green,
               ),
             ),
-            ListTile(
-              leading: FaIcon(FontAwesomeIcons.userPlus),
-              title: Text('Liste des locataires'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
+            // ListTile(
+            //   leading: FaIcon(FontAwesomeIcons.userPlus),
+            //   title: Text('Nouveau pèlerin'),
+            //   onTap: () {
+            //     // Update the state of the app.
+            //     // ...
+            //   },
+            // ),
             // ListTile(
             //   leading: FaIcon(FontAwesomeIcons.users),
             //   title: Text('Liste des pèlerins'),
@@ -105,7 +129,7 @@ class _HomePageAdminState extends State<HomePageAdmin> {
         ),
       ),
       appBar: AppBar(
-        title: Text("Administrateur"),
+        title: Text("Locataire"),
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
@@ -128,7 +152,7 @@ class _HomePageAdminState extends State<HomePageAdmin> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'Page d\'accueil Admin',
+              'Page d\'accueil Locataire',
             ),
           ],
         ),

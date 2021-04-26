@@ -19,6 +19,7 @@ class _LoginState extends State<Login> {
   TextEditingController identifiant = new TextEditingController();
   TextEditingController password = new TextEditingController();
   bool invalidUser = false;
+  // ignore: missing_return
   Future<List> sendata() async {
     final response = await http
         .post("https://groupetasnim.com/ts_requetes/verif.php", body: {
@@ -99,6 +100,7 @@ class _LoginState extends State<Login> {
               ),
               const SizedBox(height: 30),
 
+              // ignore: deprecated_member_use
               FlatButton(
                 onPressed: sendata,
                 color: Colors.green,

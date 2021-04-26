@@ -55,8 +55,9 @@ class _TestState extends State<Test> {
                 obscureText: true,
               ),
               const SizedBox(height: 30),
+              // ignore: deprecated_member_use
               FlatButton(
-                onPressed: (){},
+                onPressed: () {},
                 color: Colors.green,
                 child: Text("Connexion",
                     style: TextStyle(fontSize: 20, color: Colors.white)),
