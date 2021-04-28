@@ -10,15 +10,6 @@ import 'package:ts_requetes/agent_recouvreur/requetes.dart';
 class HomePageAgentRecouvreur extends StatefulWidget {
   HomePageAgentRecouvreur({Key key, this.title}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -27,6 +18,8 @@ class HomePageAgentRecouvreur extends StatefulWidget {
 }
 
 class _HomePageAgentRecouvreurState extends State<HomePageAgentRecouvreur> {
+  bool issearch = false;
+
   void logout() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.clear();
@@ -73,26 +66,29 @@ class _HomePageAgentRecouvreurState extends State<HomePageAgentRecouvreur> {
     return json.decode(reponse.body);
   }
 
+  showSearchBar() {
+    setState(() {
+      issearch = true;
+    });
+  }
+
+  hideSearchBar() {
+    setState(() {
+      issearch = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return WillPopScope(
       child: Scaffold(
         drawer: Drawer(
-          // Add a ListView to the drawer. This ensures the user can scroll
-          // through the options in the drawer if there isn't enough vertical
-          // space to fit everything.
           child: ListView(
             // Important: Remove any padding from the ListView.
             padding: EdgeInsets.zero,
             children: <Widget>[
               DrawerHeader(
-                child: Text('Encadreur réligieux'),
+                child: Text('Agent recouvreur'),
                 decoration: BoxDecoration(
                   color: Colors.green,
                 ),
@@ -100,10 +96,7 @@ class _HomePageAgentRecouvreurState extends State<HomePageAgentRecouvreur> {
               ListTile(
                 leading: FaIcon(FontAwesomeIcons.userPlus),
                 title: Text('Liste des locataires'),
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
-                },
+                onTap: () {},
               ),
               ListTile(
                 leading: FaIcon(FontAwesomeIcons.users),
@@ -117,8 +110,6 @@ class _HomePageAgentRecouvreurState extends State<HomePageAgentRecouvreur> {
                 leading: FaIcon(FontAwesomeIcons.signOutAlt),
                 title: Text('Déconnexion'),
                 onTap: () {
-                  // Update the state of the app.
-                  // ...
                   _showMyDialog();
                 },
               ),
@@ -127,18 +118,35 @@ class _HomePageAgentRecouvreurState extends State<HomePageAgentRecouvreur> {
         ),
         appBar: AppBar(
           brightness: Brightness.dark,
-          title: Text("Liste des locataires"),
+          title: issearch
+              ? TextFormField(
+                  decoration: InputDecoration(
+                    hintText: "Recherche...",
+                    hintStyle: TextStyle(color: Colors.white),
+                  ),
+                  style: TextStyle(color: Colors.white),
+                  onFieldSubmitted: (val) {
+                    print(val);
+                  },
+                )
+              : Text("Liste des locataires"),
+          actions: [
+            issearch
+                ? IconButton(icon: Icon(Icons.close), onPressed: hideSearchBar)
+                : IconButton(icon: Icon(Icons.search), onPressed: showSearchBar)
+          ],
         ),
-        body: Column(
+        body: ListView(
           children: [
             Container(
-              height: 600,
+              height: 670,
               child: FutureBuilder(
                 future: listeLocataires(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) print(snapshot.error);
                   return snapshot.hasData
                       ? ListView.builder(
+                          padding: EdgeInsets.zero,
                           itemCount: snapshot.data.length,
                           itemBuilder: (context, index) {
                             List list = snapshot.data;
